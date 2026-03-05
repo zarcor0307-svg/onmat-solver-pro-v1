@@ -51,6 +51,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [needsKeySelection, setNeedsKeySelection] = useState(false);
+  const [customApiKey, setCustomApiKey] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -125,7 +127,15 @@ export default function App() {
     setResult(null);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = customApiKey || process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        setError('No se ha detectado ninguna API Key. Por favor, configúrala en los ajustes (icono de engranaje) o como variable de entorno.');
+        setShowSettings(true);
+        setIsAnalyzing(false);
+        return;
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
       const model = "gemini-3-flash-preview";
 
       const systemInstruction = `
@@ -264,6 +274,44 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-[#e0e0e0] font-sans selection:bg-emerald-500/30">
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-[#151619] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileCode className="w-4 h-4 text-emerald-500" />
+                <span className="text-xs font-bold uppercase tracking-widest text-white/80">Configuración de API</span>
+              </div>
+              <button onClick={() => setShowSettings(false)} className="text-white/40 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono uppercase text-white/40 tracking-widest">Gemini API Key</label>
+                <input 
+                  type="password"
+                  value={customApiKey}
+                  onChange={(e) => setCustomApiKey(e.target.value)}
+                  placeholder="Introduce tu API Key aquí..."
+                  className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
+                />
+                <p className="text-[10px] text-white/20 leading-relaxed">
+                  Puedes obtener una clave gratuita en <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">Google AI Studio</a>. Esta clave se guardará solo en esta sesión.
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowSettings(false)}
+                className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold uppercase tracking-widest rounded-xl transition-all"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="border-b border-white/10 bg-black/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -277,6 +325,13 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setShowSettings(true)}
+              className="p-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all group"
+              title="Configuración"
+            >
+              <FileCode className="w-5 h-5 text-white/40 group-hover:text-emerald-500 transition-colors" />
+            </button>
             <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[10px] font-mono text-white/60 uppercase tracking-tighter">System Ready</span>

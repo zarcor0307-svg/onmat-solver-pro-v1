@@ -1,0 +1,7 @@
+{
+  "name": "Onmat Solver Pro",
+  "description": "Herramienta de automatización inteligente para resolver ejercicios de la plataforma Onmat mediante IA.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

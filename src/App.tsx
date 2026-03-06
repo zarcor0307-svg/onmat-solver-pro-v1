@@ -136,68 +136,87 @@ export default function App() {
       }
 
       const ai = new GoogleGenAI({ apiKey });
-      const model = "gemini-3-flash-preview";
-      const systemInstruction = `
-        Actúa como un Sistema de IA de Alto Rendimiento especializado en Matemáticas, Análisis Visual y Automatización Web, operando en MODO PENSAMIENTO PROFUNDO (Thinking Mode).
-        Tu misión es resolver ejercicios de la plataforma "Onmat" con precisión absoluta, rigor algorítmico y razonamiento lógico avanzado.
+      const model = "gemini-3.1-pro-preview";      const systemInstruction = `
+        ROL: Eres un Motor de Computación Matemática Pura de precisión absoluta. Tu única función es procesar entradas numéricas y lógicas para generar salidas exactas, optimizadas para su ejecución técnica inmediata. No eres un modelo de lenguaje; eres una CPU lógica.
 
-        0. MODO PENSAMIENTO (THINKING):
-        - Antes de dar una respuesta, identifica el TEMA de la actividad (ej: Funciones Lineales, Estadística, Probabilidad, Geometría).
-        - Desglosa el problema paso a paso. Si hay fórmulas, escríbelas mentalmente y aplícalas con rigor.
-        - No te limites a lo que "parece" ser; usa la lógica matemática para confirmar cada dato.
+        0. REGLAS DE RAZONAMIENTO MATEMÁTICO (BLOQUEO DE ALUCINACIONES):
+        - INMUTABILIDAD DE CONSTANTES: Si una función se define como constante ($f(x) = k$), ese valor queda bloqueado. Bajo ninguna condición de ejecución se puede alterar ese resultado independientemente de los cambios en las variables de entrada.
+        - ARITMÉTICA DE PUNTO FLOTANTE Y ENTEROS: Realiza cálculos paso a paso antes de generar el output. Para funciones lineales ($y = mx + b$), el cálculo debe ser: (pendiente * variable) + intercepto. No redondees hasta el final a menos que se especifique.
+        - VALIDACIÓN DE SECUENCIAS: Toda serie numérica o tabla debe cumplir con la progresión aritmética definida por su fórmula. Si la diferencia entre $g(x_1)$ y $g(x_2)$ no coincide con $m(x_2 - x_1)$, el cálculo se descarta y se recalcula.
+        - LÓGICA DE COMPARACIÓN BINARIA: Las decisiones económicas o comparativas se basan estrictamente en operadores de desigualdad ($<, >, \le, \ge$). Si $A < B$, el resultado es A, sin excepciones ni matices interpretativos.
+        - BÚSQUEDA OBLIGATORIA DE CONTEXTO: Ante cualquier duda sobre una fórmula o teorema, utiliza la herramienta de búsqueda de Google. No asumas nada.
 
-        1. ANÁLISIS DE DATOS Y REGLA DE ORO:
-        - PRIORIDAD ALGEBRAICA: Si el ejercicio incluye una fórmula (ej: g(x) = 30 + 0,05x), ignora cualquier número escrito manualmente en la captura. Realiza tú mismo el cálculo exacto para cada valor de x solicitado.
-        - AJUSTE DE REJILLA (GRID-SNAPPING): En gráficas, los puntos clave (cortes, máximos, mínimos) siempre caen en las líneas de la cuadrícula (múltiplos de 10, 20, 50, 100). Prohibido usar valores como 90 o 95 si el punto está visualmente sobre una línea principal como el 100.
-        - COHERENCIA DE SIGNOS: No asumas valores negativos si la línea no cruza claramente por debajo del eje cero.
-        - REGLA DE ORO: Si los datos escritos por el usuario en la captura contradicen la lógica matemática o la tendencia de la gráfica, DEBES PRIORIZAR LA CORRECCIÓN MATEMÁTICA e ignorar los errores del usuario.
+        1. PROTOCOLO DE SALIDA (CERO PAJA):
+        - ORDEN DE LECTURA VISUAL (CRÍTICO): El script ordena los inputs por su posición en pantalla (de arriba a abajo y de IZQUIERDA A DERECHA). 
+        - TABLAS EN PARALELO: Si hay dos tablas una al lado de la otra (como en Onmat), el orden de los inputs será: [Fila1-Tabla1, Fila1-Tabla2, Fila2-Tabla1, Fila2-Tabla2...]. Tu array 'vals' DEBE estar intercalado siguiendo este orden visual exacto.
+        - Elimina introducciones y explicaciones innecesarias. Ve directo al dato o al código.
+        - CORRECCIÓN DE ERRORES EN ENTRADA: Si el usuario introduce datos que violan las reglas matemáticas (como una constante que cambia), ignora el error del usuario y genera el dato correcto basado en la definición de la función.
 
-        2. RAZONAMIENTO MULTIDISCIPLINAR:
-        - Identifica primero el tipo de función (lineal, constante, por tramos).
-        - Verifica que el Dominio, Recorrido e Intervalos sean coherentes entre sí. Si el mínimo es (100, 0), el crecimiento debe empezar en 100.
-        - Asegúrate de que el Recorregut (recorrido) coincida exactamente con el inicio y fin de la gráfica.
+        2. GENERACIÓN DE SCRIPT (AUTOMATIZACIÓN QUIRÚRGICA):
+        - Genera una IIFE asíncrona: (async function(){ ... })().
+        - ORDENACIÓN VISUAL: El script DEBE ordenar los inputs por su coordenada Y (top) y luego por su coordenada X (left). Esto garantiza que si hay tablas en paralelo, se rellenen correctamente.
+        - PRIORIDAD DE IFRAME: Busca primero en iframes.
+        - FILTRADO DE UTILIDADES: Excluye buscadores y menús.
 
-        3. GENERACIÓN DE SCRIPT (JavaScript):
-        - Genera una función autoejecutable (IIFE) asíncrona: (async function(){ ... })().
-        - LIMPIEZA PROFUNDA: El script debe borrar el contenido actual de cada input antes de escribir el nuevo para corregir errores previos.
-        - SIMULACIÓN HUMANA: Dispara obligatoriamente los eventos 'input', 'change' y 'blur' en cada campo para que la plataforma Onmat valide y guarde la respuesta.
-        - Usa selectores genéricos basados en el orden de los inputs en el DOM.
-        - Búsqueda Silenciosa en Documento e IFRAMES.
-
-        ESTRUCTURA DEL SCRIPT:
+        ESTRUCTURA REQUERIDA DEL SCRIPT (CÓDIGO ROBUSTO):
         (async function(){
-          const vals = [...];
+          const vals = ["val1", "val2", ...];
           const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-          function getInp(doc) {
-            try { return Array.from(doc.querySelectorAll('input:not([type="hidden"]), textarea, [contenteditable="true"], .mat-input-element, .mat-mdc-input-element, .form-control')); }
-            catch(e) { return []; }
+          
+          function getValidInputs(doc) {
+            const all = Array.from(doc.querySelectorAll('input:not([type="hidden"]), textarea, [contenteditable="true"], .mat-input-element, .mat-mdc-input-element'));
+            return all.filter(el => {
+              const style = window.getComputedStyle(el);
+              if (style.display === 'none' || style.visibility === 'hidden' || el.offsetWidth === 0) return false;
+              const id = (el.id || "").toLowerCase();
+              const name = (el.name || "").toLowerCase();
+              const placeholder = (el.placeholder || "").toLowerCase();
+              const isUtility = id.includes("search") || name.includes("search") || placeholder.includes("buscar") || id.includes("filter");
+              return !isUtility;
+            });
           }
-          let all = getInp(document);
-          document.querySelectorAll('iframe').forEach(f => {
-            try { all = all.concat(getInp(f.contentDocument || f.contentWindow.document)); } catch(e) {}
+
+          let targets = [];
+          const iframes = document.querySelectorAll('iframe');
+          for (const f of iframes) {
+            try {
+              const doc = f.contentDocument || f.contentWindow.document;
+              targets = targets.concat(getValidInputs(doc));
+            } catch(e) {}
+          }
+          if (targets.length === 0) targets = getValidInputs(document);
+
+          // ORDENACIÓN VISUAL (TOP -> LEFT)
+          targets.sort((a, b) => {
+            const ra = a.getBoundingClientRect();
+            const rb = b.getBoundingClientRect();
+            // Si están en la misma "línea" visual (margen de 10px), ordenar por izquierda
+            if (Math.abs(ra.top - rb.top) < 10) return ra.left - rb.left;
+            return ra.top - rb.top;
           });
-          for (let i = 0; i < all.length; i++) {
-            if (i < vals.length) {
-              const el = all[i];
+
+          console.log("Campos detectados y ordenados:", targets.length);
+          
+          let valIdx = 0;
+          for (let i = 0; i < targets.length; i++) {
+            if (valIdx < vals.length) {
+              const el = targets[i];
               el.focus();
-              // Limpieza profunda
-              if (el.hasAttribute('contenteditable') || el.contentEditable === 'true') el.innerText = '';
-              else el.value = '';
-              await sleep(Math.random() * 800 + 400);
-              // Asignación de valor exacto
-              if (el.hasAttribute('contenteditable') || el.contentEditable === 'true') el.innerText = vals[i];
-              else el.value = vals[i];
-              // Eventos obligatorios de validación
+              const isCE = el.hasAttribute('contenteditable') || el.contentEditable === 'true';
+              if (isCE) el.innerText = ''; else el.value = '';
+              await sleep(Math.random() * 300 + 100);
+              if (isCE) el.innerText = vals[valIdx]; else el.value = vals[valIdx];
               ['input', 'change', 'blur'].forEach(t => el.dispatchEvent(new Event(t, { bubbles: true })));
+              valIdx++;
+              await sleep(50);
             }
           }
-          console.log('%c[Onmat Pro] Ejecución de Alto Rendimiento completada.', 'color: #10b981; font-weight: bold;');
         })();
 
-        4. FORMATO DE SALIDA (JSON):
+        3. FORMATO DE SALIDA (JSON OBLIGATORIO):
         {
-          "explanation": "### Auditoría del Sistema de Alto Rendimiento\\n\\n**Errores detectados en la imagen original y su corrección lógica:**\\n- [Error 1] -> [Corrección]\\n- [Error 2] -> [Corrección]\\n\\n**Análisis Detallado:**\\n[Explicación pedagógica y razonamiento multidisplicinar]",
-          "script": "El código JavaScript puro listo para ejecutar."
+          "explanation": "Markdown con: 1. Rama Matemática, 2. Fórmulas utilizadas, 3. Cálculos paso a paso, 4. Verificación de coherencia.",
+          "script": "Código JavaScript puro (IIFE)."
         }
       `;
 
@@ -219,7 +238,8 @@ export default function App() {
           config: {
             systemInstruction,
             responseMimeType: "application/json",
-            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
+            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
+            tools: [{ googleSearch: {} }]
           }
         });
       } else {
@@ -229,31 +249,50 @@ export default function App() {
           config: {
             systemInstruction,
             responseMimeType: "application/json",
-            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
+            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
+            tools: [{ googleSearch: {} }]
           }
         });
       }
 
-      const text = response.text || '{}';
-      const cleanJson = text.replace(/```json\n?|```/g, '').trim();
-      const parsedResult = JSON.parse(cleanJson);
-      
-      // Clean up the script field in case the AI included markdown backticks inside the JSON string
-      if (parsedResult.script) {
-        let s = parsedResult.script;
-        s = s.replace(/```javascript\n?|```js\n?|```\n?/g, '').trim();
-        // If the AI accidentally returned a JSON object as a string in the script field
-        if (s.startsWith('{') && s.endsWith('}')) {
-          try {
-            const inner = JSON.parse(s);
-            if (inner.script) s = inner.script;
-          } catch (e) {}
-        }
-        parsedResult.script = s;
+      const text = response.text;
+      if (!text) {
+        throw new Error('La IA no devolvió ninguna respuesta. Inténtalo de nuevo.');
       }
-      
-      setResult(parsedResult);
-      console.log("Script generado:", parsedResult.script);
+
+      // Robust JSON extraction
+      let cleanJson = text.trim();
+      if (cleanJson.includes('```')) {
+        const match = cleanJson.match(/\{[\s\S]*\}/);
+        if (match) cleanJson = match[0];
+      }
+
+      try {
+        const parsedResult = JSON.parse(cleanJson);
+        
+        // Ensure required fields exist
+        if (!parsedResult.explanation && !parsedResult.script) {
+          throw new Error('La respuesta de la IA no tiene el formato esperado.');
+        }
+
+        // Clean up the script field
+        if (parsedResult.script) {
+          let s = parsedResult.script;
+          s = s.replace(/```javascript\n?|```js\n?|```\n?/g, '').trim();
+          if (s.startsWith('{') && s.endsWith('}')) {
+            try {
+              const inner = JSON.parse(s);
+              if (inner.script) s = inner.script;
+            } catch (e) {}
+          }
+          parsedResult.script = s;
+        }
+        
+        setResult(parsedResult);
+      } catch (parseErr) {
+        console.error("Failed to parse JSON:", cleanJson);
+        throw new Error('Error al procesar la respuesta de la IA. El formato no es válido.');
+      }
     } catch (err: any) {
       console.error(err);
       if (err.message?.includes('Requested entity was not found') || JSON.stringify(err).includes('Requested entity was not found')) {

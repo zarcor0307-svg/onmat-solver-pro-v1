@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { 
   Terminal, 
   Upload, 
@@ -138,8 +138,13 @@ export default function App() {
       const ai = new GoogleGenAI({ apiKey });
       const model = "gemini-3-flash-preview";
       const systemInstruction = `
-        Actúa como un Sistema de IA de Alto Rendimiento especializado en Matemáticas, Análisis Visual y Automatización Web.
-        Tu misión es resolver ejercicios de la plataforma "Onmat" con precisión absoluta y rigor algorítmico.
+        Actúa como un Sistema de IA de Alto Rendimiento especializado en Matemáticas, Análisis Visual y Automatización Web, operando en MODO PENSAMIENTO PROFUNDO (Thinking Mode).
+        Tu misión es resolver ejercicios de la plataforma "Onmat" con precisión absoluta, rigor algorítmico y razonamiento lógico avanzado.
+
+        0. MODO PENSAMIENTO (THINKING):
+        - Antes de dar una respuesta, identifica el TEMA de la actividad (ej: Funciones Lineales, Estadística, Probabilidad, Geometría).
+        - Desglosa el problema paso a paso. Si hay fórmulas, escríbelas mentalmente y aplícalas con rigor.
+        - No te limites a lo que "parece" ser; usa la lógica matemática para confirmar cada dato.
 
         1. ANÁLISIS DE DATOS Y REGLA DE ORO:
         - PRIORIDAD ALGEBRAICA: Si el ejercicio incluye una fórmula (ej: g(x) = 30 + 0,05x), ignora cualquier número escrito manualmente en la captura. Realiza tú mismo el cálculo exacto para cada valor de x solicitado.
@@ -213,7 +218,8 @@ export default function App() {
           contents: { parts },
           config: {
             systemInstruction,
-            responseMimeType: "application/json"
+            responseMimeType: "application/json",
+            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
           }
         });
       } else {
@@ -222,7 +228,8 @@ export default function App() {
           contents: `Analiza este HTML de Onmat y genera la solución:\n\n${htmlContent}`,
           config: {
             systemInstruction,
-            responseMimeType: "application/json"
+            responseMimeType: "application/json",
+            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH }
           }
         });
       }

@@ -15,7 +15,8 @@ import {
   FileCode, 
   Image as ImageIcon,
   Loader2,
-  X
+  X,
+  RefreshCw
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { clsx, type ClassValue } from 'clsx';
@@ -295,7 +296,10 @@ export default function App() {
       }
     } catch (err: any) {
       console.error(err);
-      if (err.message?.includes('Requested entity was not found') || JSON.stringify(err).includes('Requested entity was not found')) {
+      const errStr = JSON.stringify(err);
+      if (err.message?.includes('429') || errStr.includes('429') || err.message?.includes('quota') || errStr.includes('quota')) {
+        setError('⚠️ Límite de uso excedido (Cuota agotada). Por favor, espera 60 segundos antes de volver a intentarlo o usa una API Key de un proyecto de pago.');
+      } else if (err.message?.includes('Requested entity was not found') || errStr.includes('Requested entity was not found')) {
         setError('El modelo no fue encontrado o requiere una configuración de API Key específica. Por favor, selecciona tu API Key de un proyecto de pago.');
         setNeedsKeySelection(true);
       } else {
@@ -521,12 +525,20 @@ export default function App() {
                   <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                   <p className="text-sm text-red-200/80">{error}</p>
                 </div>
-                {needsKeySelection && (
+                {needsKeySelection ? (
                   <button 
                     onClick={handleOpenKeySelection}
                     className="w-full py-3 bg-white/5 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-widest rounded-xl border border-white/10 transition-all flex items-center justify-center gap-2"
                   >
                     Configurar API Key de Pago
+                  </button>
+                ) : (
+                  <button 
+                    onClick={analyzeContent}
+                    className="w-full py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 text-xs font-bold uppercase tracking-widest rounded-xl border border-emerald-500/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Reintentar ahora
                   </button>
                 )}
               </div>

@@ -54,6 +54,7 @@ export default function App() {
   const [needsKeySelection, setNeedsKeySelection] = useState(false);
   const [customApiKey, setCustomApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const [useFlashModel, setUseFlashModel] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -137,7 +138,8 @@ export default function App() {
       }
 
       const ai = new GoogleGenAI({ apiKey });
-      const model = "gemini-3.1-pro-preview";      const systemInstruction = `
+      const model = useFlashModel ? "gemini-3-flash-preview" : "gemini-3.1-pro-preview";
+      const systemInstruction = `
         ROL: Eres un Motor de Computación Matemática Pura de precisión absoluta. Tu única función es procesar entradas numéricas y lógicas para generar salidas exactas, optimizadas para su ejecución técnica inmediata. No eres un modelo de lenguaje; eres una CPU lógica.
 
         0. REGLAS DE RAZONAMIENTO MATEMÁTICO (BLOQUEO DE ALUCINACIONES):
@@ -239,7 +241,7 @@ export default function App() {
           config: {
             systemInstruction,
             responseMimeType: "application/json",
-            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
+            thinkingConfig: { thinkingLevel: useFlashModel ? ThinkingLevel.LOW : ThinkingLevel.HIGH },
             tools: [{ googleSearch: {} }]
           }
         });
@@ -250,7 +252,7 @@ export default function App() {
           config: {
             systemInstruction,
             responseMimeType: "application/json",
-            thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
+            thinkingConfig: { thinkingLevel: useFlashModel ? ThinkingLevel.LOW : ThinkingLevel.HIGH },
             tools: [{ googleSearch: {} }]
           }
         });
@@ -398,6 +400,33 @@ export default function App() {
           {/* Left Column: Input */}
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-[#151619] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+              <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Terminal className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-white/80">Modelo IA</span>
+                </div>
+                <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
+                  <button 
+                    onClick={() => setUseFlashModel(false)}
+                    className={cn(
+                      "px-3 py-1 rounded-md text-[10px] font-bold uppercase transition-all",
+                      !useFlashModel ? "bg-emerald-500 text-black" : "text-white/40 hover:text-white/60"
+                    )}
+                  >
+                    Pro
+                  </button>
+                  <button 
+                    onClick={() => setUseFlashModel(true)}
+                    className={cn(
+                      "px-3 py-1 rounded-md text-[10px] font-bold uppercase transition-all",
+                      useFlashModel ? "bg-emerald-500 text-black" : "text-white/40 hover:text-white/60"
+                    )}
+                  >
+                    Flash
+                  </button>
+                </div>
+              </div>
+
               <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Play className="w-4 h-4 text-emerald-500" />
